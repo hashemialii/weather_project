@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Weather App</title>
+</head>
+<body>
+    <h1>Weather Forecast</h1>
+    <form id="weather-form">
+        <label for="city">Enter City:</label>
+        <input type="text" id="city" name="name" required>
+        <input type="submit" value="Get Weather">
+    </form>
+    <div id="weather-result"></div>
+    <script>
+        document.querySelector('#weather-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const city = document.querySelector('#city').value;
+
+            console.log('Sending city:', city);  // اضافه کردن لاگ برای مشاهده شهر
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/weather', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name: city }),
+                });
+
+                console.log('Response status:', response.status);  // مشاهده وضعیت پاسخ
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Weather data:', data);  // مشاهده داده‌های دریافتی از API
+
+                    document.querySelector('#weather-result').innerHTML = `
+                        <h2>Current Weather in ${data.current_weather.city}</h2>
+                        <p>Temperature: ${data.current_weather.temperature}°C</p>
+                        <p>Description: ${data.current_weather.description}</p>
+                        <h2>5-Day Forecast</h2>
+                        <ul>
+                            ${data.forecast.map(item => `
+                                <li>${item.date}: ${item.temperature}°C, ${item.description}</li>
+                            `).join('')}
+                        </ul>
+                    `;
+                } else {
+                    document.querySelector('#weather-result').innerHTML = `
+                        <p>Error fetching weather data. Please try again.</p>
+                    `;
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);  // مشاهده خطاها در لاگ
+                document.querySelector('#weather-result').innerHTML = `
+                    <p>Error occurred while fetching weather data. Please try again later.</p>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>
