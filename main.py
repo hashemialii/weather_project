@@ -13,10 +13,12 @@ API_KEY = 'd351751ed0a133daa78378b4c7e80b2b'
 class City(BaseModel):
     name: str
 
+
 # سرو کردن فایل HTML
 @app.get("/")
 def serve_homepage():
     return FileResponse(os.path.join(os.getcwd(), "index.html"))
+
 
 @app.post("/weather")
 def get_weather(city: City):
@@ -33,7 +35,8 @@ def get_weather(city: City):
     current_weather = {
         "temperature": current_data["main"]["temp"],
         "description": current_data["weather"][0]["description"],
-        "city": city_name
+        "city": city_name,
+        "country": current_data["sys"]["country"]  # اضافه کردن کشور
     }
 
     # دریافت پیش‌بینی ۵ روزه

@@ -1,7 +1,100 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        h1 {
+            margin-top: 20px;
+            color: #333;
+        }
+
+        #weather-form {
+            margin: 20px;
+            background-color: #003366;
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #weather-form label {
+            color: white;
+            font-size: 18px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+            width: 200px;
+            border: 2px solid #0056b3;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: #004494;
+            box-shadow: 0px 0px 5px #004494;
+        }
+
+        input[type="submit"] {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #004494;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #003366;
+        }
+
+        #weather-result {
+            margin-top: 20px;
+            margin-bottom: 40px; /* فاصله بیشتر از پایین صفحه */
+        }
+
+        .forecast-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .forecast-item {
+            background-color: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            width: 200px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .forecast-item h3 {
+            margin: 0;
+            color: #333;
+        }
+
+        .forecast-item p {
+            margin: 5px 0;
+            color: #666;
+        }
+    </style>
 </head>
 <body>
     <h1>Weather Forecast</h1>
@@ -16,8 +109,6 @@
             event.preventDefault();
             const city = document.querySelector('#city').value;
 
-            console.log('Sending city:', city);  // اضافه کردن لاگ برای مشاهده شهر
-
             try {
                 const response = await fetch('http://127.0.0.1:8000/weather', {
                     method: 'POST',
@@ -27,22 +118,23 @@
                     body: JSON.stringify({ name: city }),
                 });
 
-                console.log('Response status:', response.status);  // مشاهده وضعیت پاسخ
-
                 if (response.ok) {
                     const data = await response.json();
-                    console.log('Weather data:', data);  // مشاهده داده‌های دریافتی از API
 
                     document.querySelector('#weather-result').innerHTML = `
-                        <h2>Current Weather in ${data.current_weather.city}</h2>
+                        <h2>Current Weather in ${data.current_weather.city}, ${data.current_weather.country}</h2>
                         <p>Temperature: ${data.current_weather.temperature}°C</p>
                         <p>Description: ${data.current_weather.description}</p>
                         <h2>5-Day Forecast</h2>
-                        <ul>
+                        <div class="forecast-container">
                             ${data.forecast.map(item => `
-                                <li>${item.date}: ${item.temperature}°C, ${item.description}</li>
+                                <div class="forecast-item">
+                                    <h3>${item.date}</h3>
+                                    <p>Temperature: ${item.temperature}°C</p>
+                                    <p>${item.description}</p>
+                                </div>
                             `).join('')}
-                        </ul>
+                        </div>
                     `;
                 } else {
                     document.querySelector('#weather-result').innerHTML = `
@@ -50,7 +142,6 @@
                     `;
                 }
             } catch (error) {
-                console.error('Fetch error:', error);  // مشاهده خطاها در لاگ
                 document.querySelector('#weather-result').innerHTML = `
                     <p>Error occurred while fetching weather data. Please try again later.</p>
                 `;
